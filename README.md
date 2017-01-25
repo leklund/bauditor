@@ -33,6 +33,7 @@ run bundle-audit on multiple repositories
 
 Repositories must be in a format that can passed to git clone. Currently this only works on the master branch.
 
+`audit` is the only command and is the default so `bauditor` can be invoked without a command.
 ### Example
 
 ```
@@ -41,6 +42,8 @@ $ cat config
 git@github.com:leklund/chopped_ingredients.git
 git@github.com:leklund/bitbucket-irc-notification.git
 
+$ bauditor -c=config -r=git@github.com:wistia/nsq-ruby.git
+  OR
 $ bauditor audit -c=config -r=git@github.com:wistia/nsq-ruby.git
 
 [BAUDITOR] Updating the bundle-audit database
