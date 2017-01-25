@@ -102,6 +102,11 @@ ____________________________________________
 
 ```
 
+## TODO
+
+* option to set the `repo_path` instead of just `/tmp/bauditor`
+* option to persist the repositories between runs and just do a `git pull` to speed things up a lot
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
