@@ -3,6 +3,8 @@ require 'fileutils'
 
 module Bauditor
   class CLI < ::Thor
+    default_task :audit
+
     desc 'audit', 'run bundle-audit on multiple repositories'
 
     method_option :repos, type: :array, aliases: 'r'
