@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Lukas Eklund']
   spec.email         = ['lukas@eklund.io']
 
-  spec.summary       = %q{Run bundler audit on multiple repositories}
-  spec.homepage      = 'https://eklund.io'
+  spec.summary       = %q{Run bundler-audit on multiple repositories}
+  spec.homepage      = 'https://github.com/leklund/bauditor'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
