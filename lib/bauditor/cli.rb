@@ -17,10 +17,11 @@ module Bauditor
         exit 1
       end
 
+      setup_dirs
+      Dir.chdir repo_path
+
       update_db
       set_repos
-
-      setup_dirs
 
       self.summary = {}
       audit_repos
@@ -91,6 +92,7 @@ module Bauditor
     def setup_dirs
       unless File.exist?(repo_path)
         Dir.mkdir(repo_path)
+        Dir.mkdir(File.join(repo_path, '.bundle'))
         @dir_created = true
       end
     end
