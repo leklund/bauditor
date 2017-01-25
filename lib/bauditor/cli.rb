@@ -17,6 +17,8 @@ module Bauditor
         exit 1
       end
 
+      @cwd = Dir.getwd
+
       setup_dirs
       Dir.chdir repo_path
 
@@ -36,7 +38,7 @@ module Bauditor
     attr_accessor :repos, :summary
 
     def add_repos_from_config
-      self.repos += File.readlines(options[:config]).map(&:chomp)
+      self.repos += File.readlines(File.join(@cwd, options[:config])).map(&:chomp)
     end
 
     def audit_repos
@@ -97,6 +99,8 @@ module Bauditor
     end
 
     def summary_report
+      return if summary.empty?
+
       say '[BAUDITOR] summary report:', [:green, :bold]
 
       long_name = summary.keys.max_by(&:length)
