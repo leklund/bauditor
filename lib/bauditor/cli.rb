@@ -52,10 +52,9 @@ module Bauditor
         say "[BAUDITOR] fetching and auditing #{name}", :yellow
         hr
 
-        git = `git clone #{repo} --branch master --single-branch #{name} 2>&1`
+        `git clone #{repo} --branch master --single-branch #{name}`
         unless $?.success?
           say "[BAUDITOR] error fetching git repo #{name}", :red
-          puts git
           next
         end
 
