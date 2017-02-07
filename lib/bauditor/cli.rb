@@ -25,7 +25,6 @@ module Bauditor
       desc: 'Path to file containing repositories one per line.'
 
     def audit
-      puts options
       if options[:repos].nil? && options[:config].nil?
         puts 'Please provide either a list of repos (--repos=one two)'
         puts 'or a configuraiton file --config=repos.cfg'
