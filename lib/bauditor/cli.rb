@@ -1,5 +1,6 @@
 require 'thor'
 require 'fileutils'
+require 'pry'
 
 module Bauditor
   class CLI < ::Thor
@@ -7,10 +8,24 @@ module Bauditor
 
     desc 'audit', 'run bundle-audit on multiple repositories'
 
-    method_option :repos, type: :array, aliases: 'r'
-    method_option :config, type: :string, aliases: 'c'
+    method_option :repo_path,
+      type: :string,
+      desc: 'Path to directory where fetched repositories will be stored'
+    method_option :persist,
+      type: :boolean,
+      desc: 'Persist repositories, or not.',
+      default: true
+    method_option :repos,
+      type: :array,
+      aliases: 'r',
+      desc: 'Space seperate list of repositories'
+    method_option :config,
+      type: :string,
+      aliases: 'c',
+      desc: 'Path to file containing repositories one per line.'
 
     def audit
+      puts options
       if options[:repos].nil? && options[:config].nil?
         puts 'Please provide either a list of repos (--repos=one two)'
         puts 'or a configuraiton file --config=repos.cfg'
@@ -54,19 +69,41 @@ module Bauditor
         say "[BAUDITOR] fetching and auditing #{name}", :yellow
         hr
 
-        `git clone #{repo} --branch master --single-branch #{name}`
-        unless $?.success?
-          say "[BAUDITOR] error fetching git repo #{name}", :red
-          next
+        if File.exist?(name)
+          Dir.chdir name
+          `git pull origin master`
+
+          unless $?.success?
+            say "[BAUDITOR] error pulling origin master from  git repo #{name}", :red
+            next
+          end
+        else
+          `git clone #{repo} --branch master --single-branch #{name}`
+
+          unless $?.success?
+            say "[BAUDITOR] error fetching git repo #{name}", :red
+            next
+          end
+          Dir.chdir name
         end
 
-        Dir.chdir name
-
+        rm_lock = false
+        unless File.exist?('Gemfile.lock')
+          say "[BAUDITOR] running bundle lock for #{name}", :yellow
+          system 'bundle lock'
+          rm_lock = true
+        end
         success = system 'bundle-audit'
+
+        FileUtils.rm('Gemfile.lock') if rm_lock
 
         self.summary[name] = success
       end
       hr
+    end
+
+    def persist?
+      options['persist']
     end
 
     def repo_path
@@ -76,6 +113,7 @@ module Bauditor
     def hr
       say "---------------------------------------------------", :blue
     end
+
 
     def set_repos
       self.repos = options.fetch(:repos, [])
@@ -93,9 +131,10 @@ module Bauditor
     def setup_dirs
       unless File.exist?(repo_path)
         Dir.mkdir(repo_path)
-        Dir.mkdir(File.join(repo_path, '.bundle'))
         @dir_created = true
       end
+      bundle_path = File.join(repo_path, '.bundle')
+      Dir.mkdir(bundle_path) unless File.exist?(bundle_path)
     end
 
     def summary_report
@@ -127,8 +166,12 @@ module Bauditor
 
     def teardown
       Dir.chdir File.dirname(__FILE__)
-      return unless @dir_created
-      FileUtils.rm_rf repo_path
+      return if persist?
+      if @dir_created
+        FileUtils.rm_rf repo_path
+      else
+        Pathname.new(repo_path).children.each { |p| p.rmtree }
+      end
     end
 
     def update_db

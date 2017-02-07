@@ -4,11 +4,14 @@ Run [bundler-audit](https://github.com/rubysec/bundler-audit) on multiple reposi
 
 If you manage many ruby applications it can be a hassle to keep them all up-to-date and audited. This gem can aid in running bundle-audit on many repositories at once. It will do the following:
 
-* create a directory in `/tmp/bauditor` (TODO: make this configurable)
+* create a directory in `/tmp/bauditor` OR in the --repo_path
 * fetch a list of repos with `git clone repo --branch master --single-branch`
+* If a `Gemfile.lock` is not present it will run `bundle lock` in an attempt to generate a lockfile.
 * run `bundle-audit` on the repositories `Gemfile.lock` and print the output
-* Print a summary reports
-* `rm -rf /tmp/bauditor`
+* Print a summary report
+* If the --no-persist option is passed it will `rm -rf #{repo_path}.`
+
+By default it will persist the repositories after each run. This way it only has to go a `git pull origin master` if the repository has already been cloned.
 
 ## Installation
 
@@ -25,8 +28,11 @@ Usage:
   bauditor audit
 
 Options:
-  r, [--repos=list of repositories]
-  c, [--config=CONFIG_FILE]
+      [--repo-path=REPO_PATH]      # Path to directory where fetched repositories will be stored
+      [--persist], [--no-persist]  # Persist repositories, or not.
+                                   # Default: true
+  r, [--repos=one two three]       # Space seperate list of repositories
+  c, [--config=CONFIG]             # Path to file containing repositories one per line.
 
 run bundle-audit on multiple repositories
 ```
@@ -101,11 +107,6 @@ ____________________________________________
 --------------------------------------------
 
 ```
-
-## TODO
-
-* option to set the `repo_path` instead of just `/tmp/bauditor`
-* option to persist the repositories between runs and just do a `git pull` to speed things up a lot
 
 ## Development
 
