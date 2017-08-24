@@ -1,6 +1,5 @@
 require 'thor'
 require 'fileutils'
-require 'pry'
 
 module Bauditor
   class CLI < ::Thor
